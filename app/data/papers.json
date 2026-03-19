@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "title": "Data Structures Question Paper",
+    "subject": "Data Structures",
+    "year": "2023",
+    "semester": "4",
+    "file": "/papers/ds-2023.pdf"
+  },
+  {
+    "id": 2,
+    "title": "Operating Systems Question Paper",
+    "subject": "Operating Systems",
+    "year": "2022",
+    "semester": "5",
+    "file": "/papers/os-2022.pdf"
+  },
+  {
+    "id": 3,
+    "title": "Database Management Systems",
+    "subject": "DBMS",
+    "year": "2023",
+    "semester": "5",
+    "file": "/papers/dbms-2023.pdf"
+  },
+  {
+    "id": 4,
+    "title": "Computer Networks",
+    "subject": "Computer Networks",
+    "year": "2021",
+    "semester": "6",
+    "file": "/papers/cn-2021.pdf"
+  }
+]
