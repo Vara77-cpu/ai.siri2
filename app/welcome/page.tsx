@@ -15,6 +15,7 @@ export default function WelcomePage() {
   const message = `Welcome ${session?.user?.name || "Student"}.
 Your AI learning assistant is ready.`
 
+  /* typing */
   useEffect(() => {
     if (!session) return
 
@@ -28,6 +29,7 @@ Your AI learning assistant is ready.`
     return () => clearInterval(typing)
   }, [session, message])
 
+  /* AI voice */
   useEffect(() => {
     if (!session?.user?.name) return
 
@@ -35,8 +37,9 @@ Your AI learning assistant is ready.`
       if (typeof window === "undefined" || !window.speechSynthesis) return
 
       window.speechSynthesis.cancel()
+
       const voices = window.speechSynthesis.getVoices()
-      if (voices.length === 0) return
+      if (!voices.length) return
 
       const femaleVoice =
         voices.find(v => v.name.includes("Female")) ||
@@ -45,12 +48,15 @@ Your AI learning assistant is ready.`
         voices[0]
 
       const speech = new SpeechSynthesisUtterance(
-        `Welcome back ${session?.user?.name}. Your AI learning assistant is ready`
+        `Hello ${session?.user?.name}. Welcome to AI Siri. I am your personal learning assistant. Let's begin your journey.`
       )
 
       if (femaleVoice) speech.voice = femaleVoice
-      speech.rate = 1
-      speech.pitch = 1.1
+
+      speech.onstart = () => {
+        const vid = document.querySelector(".assistantVideo") as HTMLVideoElement
+        if (vid) vid.playbackRate = 1
+      }
 
       speech.onend = () => setSpeechFinished(true)
 
@@ -77,6 +83,19 @@ Your AI learning assistant is ready.`
     <div className="page">
       <ParticlesBackground />
 
+      {/* AI ASSISTANT */}
+      <div className="assistant">
+        <video
+          src="/ai-avatar.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="assistantVideo"
+        />
+        <div className="assistantGlow" />
+      </div>
+
       {/* SNOW */}
       <div className="aiSnow">
         {particles.map((_, i) => (
@@ -84,9 +103,9 @@ Your AI learning assistant is ready.`
             key={i}
             className="snow"
             style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${6 + Math.random() * 4}s`
+              left: `${(i * 7) % 100}%`,
+              animationDelay: `${(i % 5) * 0.5}s`,
+              animationDuration: `${6 + (i % 4)}s`
             }}
           >
             ✦
@@ -95,16 +114,9 @@ Your AI learning assistant is ready.`
       </div>
 
       {/* PANEL */}
-      <div className="panel card3d shimmer glow">
-        <div className="orb-container">
-          <div className="ring" />
-          <div className="ring2" />
-          <div className="orb" />
-        </div>
-
+      <div className="panel">
         <h1 className="title">AI.SIRI</h1>
 
-        {/* MARQUEE */}
         <div className="marquee">
           <span>🚀 AI Powered Learning • Smart Education • Future Ready •</span>
         </div>
@@ -122,174 +134,134 @@ Your AI learning assistant is ready.`
       </div>
 
       <style jsx>{`
-        .page {
-          width: 100vw;
-          height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          color: white;
-          overflow: hidden;
-          background: radial-gradient(circle at center, #020617, #000);
+
+        .page{
+          width:100vw;
+          height:100vh;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          position:relative;
+          overflow:hidden;
+          background:#020617;
+          color:white;
         }
 
-        /* 3D + GLASS */
-        .panel {
-          width: 520px;
-          max-width: 90%;
-          padding: 40px;
-          border-radius: 28px;
-          background: rgba(255, 255, 255, .06);
-          border: 1px solid rgba(255, 255, 255, .15);
-          backdrop-filter: blur(30px);
-          text-align: center;
-          box-shadow: 0 0 60px rgba(147, 51, 234, .35);
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%);
-          z-index: 10;
-          transition: all 0.4s ease;
+        /* AI ASSISTANT */
+
+        .assistant{
+          position:absolute;
+          left:8%;
+          top:50%;
+          transform:translateY(-50%);
+          z-index:5;
+          animation:float 4s ease-in-out infinite;
         }
 
-        .card3d:hover {
-          transform: translate(-50%, -50%) rotateX(6deg) rotateY(-6deg) scale(1.05);
+        .assistantVideo{
+          width:240px;
+          border-radius:20px;
+          z-index:2;
         }
 
-        .glow {
-          box-shadow: 0 0 20px #9333ea, 0 0 60px rgba(147,51,234,.4);
+        .assistantGlow{
+          position:absolute;
+          width:280px;
+          height:280px;
+          border-radius:50%;
+          background:radial-gradient(circle,#9333ea55,transparent);
+          top:50%;
+          left:50%;
+          transform:translate(-50%,-50%);
+          animation:pulse 2s infinite;
         }
 
-        /* SHIMMER */
-        .shimmer::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
-          animation: shimmerMove 3s infinite;
+        @keyframes float{
+          0%,100%{transform:translateY(-50%)}
+          50%{transform:translateY(-55%)}
         }
 
-        @keyframes shimmerMove {
-          100% { left: 100%; }
+        @keyframes pulse{
+          50%{transform:translate(-50%,-50%) scale(1.2)}
         }
 
-        /* ORB */
-        .orb-container {
-          position: relative;
-          width: 120px;
-          height: 120px;
-          margin: 0 auto 20px auto;
+        /* PANEL */
+
+        .panel{
+          width:500px;
+          padding:40px;
+          border-radius:28px;
+          background:rgba(255,255,255,.06);
+          backdrop-filter:blur(30px);
+          border:1px solid rgba(255,255,255,.1);
+          text-align:center;
+          position:absolute;
+          left:60%;
+          top:50%;
+          transform:translate(-50%,-50%);
+          box-shadow:0 0 60px rgba(147,51,234,.3);
         }
 
-        .orb {
-          width: 120px;
-          height: 120px;
-          border-radius: 50%;
-          background: radial-gradient(circle, #c026d3, #9333ea, #302b63);
-          box-shadow: 0 0 40px #9333ea, 0 0 80px #9333ea;
-          animation: pulse 3s infinite;
-          position: absolute;
+        .title{
+          font-size:40px;
+          background:linear-gradient(90deg,#9333ea,#c026d3);
+          -webkit-background-clip:text;
+          -webkit-text-fill-color:transparent;
         }
 
-        .ring {
-          position: absolute;
-          border: 1px solid rgba(147, 51, 234, .6);
-          border-radius: 50%;
-          inset: 0;
-          animation: spin 10s linear infinite;
+        .marquee{
+          margin-top:10px;
+          overflow:hidden;
+          white-space:nowrap;
+          color:#a78bfa;
         }
 
-        .ring2 {
-          position: absolute;
-          border: 1px solid rgba(147, 51, 234, .3);
-          border-radius: 50%;
-          inset: -12px;
-          animation: spinReverse 14s linear infinite;
+        .marquee span{
+          display:inline-block;
+          padding-left:100%;
+          animation:marquee 10s linear infinite;
         }
 
-        @keyframes spin { 100% { transform: rotate(360deg) } }
-        @keyframes spinReverse { 100% { transform: rotate(-360deg) } }
-        @keyframes pulse { 50% { transform: scale(1.1) } }
-
-        .title {
-          font-size: 40px;
-          font-weight: 800;
-          margin-top: 10px;
-          background: linear-gradient(90deg, #9333ea, #c026d3);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+        @keyframes marquee{
+          100%{transform:translateX(-100%)}
         }
 
-        /* MARQUEE */
-        .marquee {
-          overflow: hidden;
-          white-space: nowrap;
-          margin-top: 10px;
-          color: #a78bfa;
+        .text{
+          margin-top:20px;
+          color:#cbd5f5;
         }
 
-        .marquee span {
-          display: inline-block;
-          padding-left: 100%;
-          animation: marquee 12s linear infinite;
-        }
-
-        @keyframes marquee {
-          100% { transform: translateX(-100%); }
-        }
-
-        .text {
-          margin-top: 18px;
-          font-size: 18px;
-          color: #d1d5db;
-          line-height: 1.6;
-          white-space: pre-wrap;
-        }
-
-        .enterBtn {
-          margin-top: 30px;
-          padding: 16px 30px;
-          border: none;
-          border-radius: 16px;
-          font-size: 16px;
-          font-weight: 600;
-          cursor: pointer;
-          background: linear-gradient(90deg, #9333ea, #c026d3);
-          color: white;
-          transition: .3s;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .enterBtn:hover {
-          transform: scale(1.08);
-          box-shadow: 0 15px 40px rgba(147, 51, 234, .8);
+        .enterBtn{
+          margin-top:30px;
+          padding:15px 30px;
+          border-radius:16px;
+          border:none;
+          background:linear-gradient(90deg,#9333ea,#c026d3);
+          color:white;
+          cursor:pointer;
         }
 
         /* SNOW */
-        .aiSnow {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
+
+        .aiSnow{
+          position:absolute;
+          inset:0;
         }
 
-        .snow {
-          position: absolute;
-          top: -20px;
-          color: #9333ea;
-          animation: fall linear infinite;
+        .snow{
+          position:absolute;
+          top:-20px;
+          color:#9333ea;
+          animation:fall linear infinite;
         }
 
-        @keyframes fall {
-          100% {
-            transform: translateY(110vh) rotate(360deg);
-            opacity: 0;
+        @keyframes fall{
+          100%{
+            transform:translateY(110vh) rotate(360deg);
+            opacity:0;
           }
         }
+
       `}</style>
     </div>
   )

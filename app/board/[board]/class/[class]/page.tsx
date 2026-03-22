@@ -8,7 +8,13 @@ export default function SubjectsPage(){
   const params = useParams()
   const router = useRouter()
 
-  const classId = params?.class?.toString().toLowerCase()
+  const classParam = params?.class
+  const classId =
+    typeof classParam === "string"
+      ? classParam.toLowerCase()
+      : Array.isArray(classParam)
+      ? classParam[0].toLowerCase()
+      : ""
 
   console.log("CLASS PARAM:", classId)
 
@@ -18,7 +24,11 @@ export default function SubjectsPage(){
     return <p style={{color:"white",padding:40}}>❌ Class not found: {classId}</p>
   }
 
-  const subjects = data.subjects
+  const subjects = data?.subjects
+
+  if(!subjects){
+    return <p style={{color:"white",padding:40}}>⚠️ No subjects found</p>
+  }
 
   function openLesson(subjectKey:string, unitName:string, lesson:string){
 
@@ -34,7 +44,7 @@ export default function SubjectsPage(){
 
     <div className="page">
 
-      <h1>{classId.toUpperCase()} Syllabus</h1>
+      <h1> {classId && classId.toUpperCase()} Syllabus </h1>
 
       <div className="grid">
 
@@ -42,13 +52,17 @@ export default function SubjectsPage(){
 
           const subject = subjects[key as keyof typeof subjects]
 
+          if(!subject) return null
+
           return(
 
             <div key={key} className="card">
 
-              <h2>{subject.name}</h2>
+              <h2>{("name" in subject ? subject.name : key)}</h2>
 
-              {subject.units.map((unit:any,i:number)=>{
+              {subject.units?.map((unit:any,i:number)=>{
+
+                if(!unit) return null
 
                 return(
 
@@ -58,7 +72,7 @@ export default function SubjectsPage(){
 
                     <ul>
 
-                      {unit.lessons.map((lesson:string,j:number)=>(
+                      {unit.lessons?.map((lesson:string,j:number)=>(
 
                         <li
                           key={j}

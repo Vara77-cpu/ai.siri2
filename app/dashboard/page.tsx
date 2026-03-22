@@ -4,7 +4,6 @@ import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import XPProgress from "@/app/components/XPProgress"
 import VantaBackground from "@/app/components/VantaBackground"
 import AuroraGlow from "@/app/components/AuroraGlow"
 
@@ -16,91 +15,62 @@ const router=useRouter()
 const [text,setText]=useState("")
 const [typingStarted,setTypingStarted]=useState(false)
 
-/* 🔥 NEW STATE (RESUME) */
+/* KEEP PROGRESS LOGIC (not used in UI) */
 const [progress,setProgress]=useState<any>(null)
 
-/* Smart greeting */
+/* Greeting */
 
 const hour = new Date().getHours()
 
 let greeting = "Hello"
-
-if(hour < 12){
-greeting = "Good morning ☀️"
-}
-else if(hour < 18){
-greeting = "Good afternoon 🚀"
-}
-else{
-greeting = "Good evening 🌙"
-}
+if(hour < 12) greeting = "Good morning ☀️"
+else if(hour < 18) greeting = "Good afternoon 🚀"
+else greeting = "Good evening 🌙"
 
 const message=`${greeting} ${session?.user?.name || "Student"}.
 Your AI assistant is ready.
 Continue your learning journey.`
 
-/* protect route */
+/* protect */
 
 useEffect(()=>{
 if(status==="loading") return
 if(!session) router.push("/login")
 },[session,status,router])
 
-/* 🔥 FETCH LAST PROGRESS */
+/* fetch progress (kept safe) */
 
 useEffect(()=>{
-
 async function fetchProgress(){
-
 if(!session?.user?.email) return
-
 try{
-
 const res = await fetch(`/api/progress?email=${session.user.email}`)
 const data = await res.json()
-
-if(data){
-setProgress(data)
+if(data) setProgress(data)
+}catch{}
 }
-
-}catch(e){
-console.log(e)
-}
-
-}
-
 fetchProgress()
-
 },[session])
 
-/* typing animation */
+/* typing */
 
 useEffect(()=>{
-
 if(!session || typingStarted) return
 setTypingStarted(true)
 
 let i=0
-
 const typing=setInterval(()=>{
-
 setText(message.slice(0,i))
 i++
-
-if(i>message.length){
-clearInterval(typing)
-}
-
+if(i>message.length) clearInterval(typing)
 },35)
 
 return()=>clearInterval(typing)
-
 },[session,message,typingStarted])
 
-/* 🔥 RESUME FUNCTION */
+/* continue */
 
 function handleContinue(){
-
 if(progress){
 router.push(
 `/board/${progress.board}/class/${progress.class}/subject/${progress.subject}/unit/${progress.unit}/lesson/${progress.lesson}`
@@ -108,7 +78,6 @@ router.push(
 }else{
 router.push("/board")
 }
-
 }
 
 if(!session) return null
@@ -129,7 +98,6 @@ min-height:100vh;
 padding:70px;
 background:#020617;
 color:white;
-font-family:system-ui;
 position:relative;
 overflow:hidden;
 }
@@ -164,51 +132,70 @@ border:2px solid #9333ea;
 .userInfo{
 display:flex;
 flex-direction:column;
-line-height:1.2;
-}
-
-.userName{
-font-size:14px;
-font-weight:600;
-}
-
-.userEmail{
-font-size:12px;
-color:#94a3b8;
 }
 
 .logout{
 padding:10px 20px;
 border-radius:14px;
-border:1px solid rgba(255,255,255,.2);
 background:rgba(255,255,255,.06);
-cursor:pointer;
+border:1px solid rgba(255,255,255,.2);
 color:white;
+cursor:pointer;
 }
 
 /* AI PANEL */
 
 .aiPanel{
+position:relative;
+overflow:hidden;
 margin-bottom:40px;
-padding:40px 50px;
-border-radius:28px;
+padding:50px;
+border-radius:30px;
 background:rgba(255,255,255,.05);
 border:1px solid rgba(255,255,255,.2);
 backdrop-filter:blur(40px);
 box-shadow:0 0 80px rgba(147,51,234,.35);
 text-align:center;
 max-width:900px;
-margin-left:auto;
-margin-right:auto;
+margin:auto;
 }
 
-/* AI CORE */
+/* 🔥 INSIDE PARTICLES */
+
+.cardParticles{
+position:absolute;
+inset:0;
+overflow:hidden;
+border-radius:30px;
+pointer-events:none;
+z-index:0;
+}
+
+.p{
+position:absolute;
+width:6px;
+height:6px;
+background:#a855f7;
+border-radius:50%;
+opacity:.6;
+box-shadow:0 0 10px #9333ea,0 0 20px #9333ea;
+animation:floatParticle 6s linear infinite;
+}
+
+@keyframes floatParticle{
+0%{transform:translateY(0)}
+50%{transform:translateY(-40px)}
+100%{transform:translateY(-80px);opacity:0}
+}
+
+/* ORB */
 
 .aiCore{
 position:relative;
 width:150px;
 height:150px;
-margin:0 auto 20px auto;
+margin:0 auto 20px;
+z-index:1;
 }
 
 .aiOrb{
@@ -216,60 +203,37 @@ width:150px;
 height:150px;
 border-radius:50%;
 background:radial-gradient(circle,#9333ea,#4c1d95,#020617);
-box-shadow:
-0 0 40px #9333ea,
-0 0 80px #9333ea,
-0 0 140px #9333ea;
-animation:pulse 3s infinite ease-in-out;
+box-shadow:0 0 40px #9333ea,0 0 80px #9333ea;
+animation:pulse 3s infinite;
 position:absolute;
 }
 
-.ring{
+.ring,.ring2{
 position:absolute;
-border:1px solid rgba(147,51,234,.6);
 border-radius:50%;
-top:0;
-left:0;
-right:0;
-bottom:0;
+inset:0;
+border:1px solid rgba(147,51,234,.5);
 animation:spin 10s linear infinite;
 }
 
 .ring2{
-position:absolute;
-border:1px solid rgba(147,51,234,.4);
-border-radius:50%;
-top:-20px;
-left:-20px;
-right:-20px;
-bottom:-20px;
+inset:-20px;
 animation:spinReverse 14s linear infinite;
 }
 
-@keyframes spin{
-0%{transform:rotate(0deg)}
-100%{transform:rotate(360deg)}
-}
-
-@keyframes spinReverse{
-0%{transform:rotate(360deg)}
-100%{transform:rotate(0deg)}
-}
-
-@keyframes pulse{
-0%{transform:scale(1)}
-50%{transform:scale(1.1)}
-100%{transform:scale(1)}
-}
+@keyframes spin{100%{transform:rotate(360deg)}}
+@keyframes spinReverse{100%{transform:rotate(-360deg)}}
+@keyframes pulse{50%{transform:scale(1.1)}}
 
 .aiText{
 font-size:22px;
-line-height:1.6;
 color:#cbd5f5;
 white-space:pre-wrap;
+z-index:1;
+position:relative;
 }
 
-/* ACTION BUTTONS */
+/* BUTTONS */
 
 .actions{
 margin-top:20px;
@@ -277,6 +241,8 @@ display:flex;
 justify-content:center;
 gap:18px;
 flex-wrap:wrap;
+z-index:1;
+position:relative;
 }
 
 .btn{
@@ -284,14 +250,14 @@ padding:18px 32px;
 border-radius:18px;
 border:none;
 font-weight:600;
-font-size:16px;
 cursor:pointer;
 color:white;
 transition:.3s;
 }
 
 .btn:hover{
-transform:scale(1.05);
+transform:scale(1.08);
+box-shadow:0 10px 40px rgba(147,51,234,.6);
 }
 
 .learnBtn{
@@ -302,30 +268,7 @@ background:linear-gradient(90deg,#9333ea,#c026d3);
 background:#4f46e5;
 }
 
-/* PROGRESS */
-
-.progress{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:25px;
-margin-bottom:40px;
-}
-
-.card{
-background:rgba(255,255,255,.06);
-border:1px solid rgba(255,255,255,.18);
-border-radius:24px;
-padding:28px;
-text-align:center;
-}
-
-.stat{
-font-size:28px;
-font-weight:700;
-margin-top:10px;
-}
-
-/* FEATURE CARDS */
+/* FEATURES */
 
 .features{
 display:grid;
@@ -338,7 +281,6 @@ padding:26px;
 border-radius:24px;
 background:rgba(255,255,255,.06);
 border:1px solid rgba(255,255,255,.18);
-backdrop-filter:blur(35px);
 cursor:pointer;
 transition:.3s;
 text-align:center;
@@ -364,60 +306,56 @@ margin-bottom:10px;
 <h1 style={{fontSize:"38px"}}>
 {greeting}, {session?.user?.name}
 </h1>
-
-<p style={{color:"#94a3b8"}}>
-Your AI learning control center
-</p>
+<p style={{color:"#94a3b8"}}>Your AI learning control center</p>
 </div>
 
 <div className="userBox">
-
-<img
-src={session?.user?.image || "/user.png"}
-className="avatar"
-/>
-
+<img src={session?.user?.image || "/user.png"} className="avatar"/>
 <div className="userInfo">
-<div className="userName">{session?.user?.name}</div>
-<div className="userEmail">{session?.user?.email}</div>
+<div>{session?.user?.name}</div>
+<div style={{fontSize:"12px",color:"#94a3b8"}}>
+{session?.user?.email}
+</div>
+</div>
+<button className="logout" onClick={()=>signOut()}>Logout</button>
 </div>
 
-<button className="logout" onClick={()=>signOut()}>
-Logout </button>
-
 </div>
 
-</div>
-
-{/* AI HERO */}
+{/* HERO */}
 
 <div className="aiPanel">
 
-<div className="aiCore">
+{/* 🔥 PARTICLES */}
+<div className="cardParticles">
+{Array.from({length:25}).map((_,i)=>(
+<span
+key={i}
+className="p"
+style={{
+left:`${Math.random()*100}%`,
+top:`${Math.random()*100}%`,
+animationDelay:`${Math.random()*3}s`
+}}
+/>
+))}
+</div>
 
+<div className="aiCore">
 <div className="ring"/>
 <div className="ring2"/>
 <div className="aiOrb"/>
-
 </div>
 
-<pre className="aiText">
-{text}
-</pre>
+<pre className="aiText">{text}</pre>
 
 <div className="actions">
 
-<button
-className="btn learnBtn"
-onClick={handleContinue}
->
+<button className="btn learnBtn" onClick={handleContinue}>
 Continue Learning
 </button>
 
-<button
-className="btn aiBtn"
-onClick={()=>router.push("/ai-tutor")}
->
+<button className="btn aiBtn" onClick={()=>router.push("/ai-tutor")}>
 Ask AI Tutor
 </button>
 
@@ -425,60 +363,32 @@ Ask AI Tutor
 
 </div>
 
-{/* PROGRESS */}
-
-<div className="progress">
-
-<div className="card">
-Lessons Completed
-<div className="stat">0</div>
-</div>
-
-<div className="card">
-Current Streak
-<div className="stat">0 Days</div>
-</div>
-
-<div className="card">
-<h3>XP Progress</h3>
-<br/>
-<XPProgress/>
-</div>
-
-</div>
-
-{/* FEATURE CARDS */}
+{/* FEATURES */}
 
 <div className="features">
 
 <div className="featureCard" onClick={()=>router.push("/board")}>
-<div className="icon">📚</div>
-Start Learning
+<div className="icon">📚</div>Start Learning
 </div>
 
 <div className="featureCard" onClick={()=>router.push("/results")}>
-<div className="icon">📄</div>
-Results
+<div className="icon">📄</div>Results
 </div>
 
 <div className="featureCard" onClick={()=>router.push("/resources")}>
-<div className="icon">📚</div>
-Resources
+<div className="icon">📚</div>Resources
 </div>
 
 <div className="featureCard" onClick={()=>router.push("/competitive")}>
-<div className="icon">🎯</div>
-Competitive
+<div className="icon">🎯</div>Competitive
 </div>
 
 <div className="featureCard" onClick={()=>router.push("/skills")}>
-<div className="icon">💻</div>
-Skills
+<div className="icon">💻</div>Skills
 </div>
 
 <div className="featureCard" onClick={()=>router.push("/explore")}>
-<div className="icon">🎓</div>
-Explore
+<div className="icon">🎓</div>Explore
 </div>
 
 </div>

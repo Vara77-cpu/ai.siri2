@@ -186,6 +186,7 @@ export const syllabus = {
     subjects: {
 
       english: {
+        name: "English",
         units: [
           {
             name: "Grammar Basics",
@@ -226,6 +227,7 @@ export const syllabus = {
       },
 
       maths: {
+        name: "Mathematics",
         units: [
           {
             name: "Numbers",
@@ -267,6 +269,7 @@ export const syllabus = {
       },
 
       evs: {
+        name: "Environmental Science",
         units: [
           {
             name: "Environment Basics",

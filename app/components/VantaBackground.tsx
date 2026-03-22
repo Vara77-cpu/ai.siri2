@@ -12,6 +12,7 @@ export default function VantaBackground() {
     const loadVanta = async () => {
 
       const THREE = await import("three")
+      // @ts-ignore
       const NET = (await import("vanta/dist/vanta.net.min")).default
 
       effectRef.current = NET({
