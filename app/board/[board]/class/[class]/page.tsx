@@ -2,8 +2,10 @@
 
 import { useParams, useRouter } from "next/navigation"
 import { syllabus } from "@/app/data/syllabus"
+import VantaBackground from "@/app/components/VantaBackground"
+import AuroraGlow from "@/app/components/AuroraGlow"
 
-export default function SubjectsPage(){
+export default function SubjectsPage() {
 
   const params = useParams()
   const router = useRouter()
@@ -16,74 +18,76 @@ export default function SubjectsPage(){
       ? classParam[0].toLowerCase()
       : ""
 
-  console.log("CLASS PARAM:", classId)
-
   const data = syllabus[classId as keyof typeof syllabus]
 
-  if(!data){
-    return <p style={{color:"white",padding:40}}>❌ Class not found: {classId}</p>
+  if (!data) {
+    return <p style={{ color: "white", padding: 40 }}>❌ Class not found</p>
   }
 
-  const subjects = data?.subjects
+  const subjects = data.subjects
 
-  if(!subjects){
-    return <p style={{color:"white",padding:40}}>⚠️ No subjects found</p>
-  }
-
-  function openLesson(subjectKey:string, unitName:string, lesson:string){
-
-    const unitSlug = unitName.toLowerCase().replace(/\s+/g,"-")
-    const lessonSlug = lesson.toLowerCase().replace(/\s+/g,"-")
+  function openLesson(subjectKey: string, unitName: string, lesson: string) {
+    const unitSlug = unitName.toLowerCase().replace(/\s+/g, "-")
+    const lessonSlug = lesson.toLowerCase().replace(/\s+/g, "-")
 
     router.push(
       `/learn?subject=${subjectKey}&unit=${unitSlug}&lesson=${lessonSlug}`
     )
   }
 
-  return(
-
+  return (
     <div className="page">
 
-      <h1> {classId && classId.toUpperCase()} Syllabus </h1>
+      <VantaBackground />
+      <AuroraGlow />
 
-      <div className="grid">
+      <div className="content">
 
-        {Object.keys(subjects).map((key)=>{
+        {/* HEADER */}
+        <div className="header">
+          <h1>{classId.toUpperCase()} Syllabus</h1>
+          <p>Select subject → unit → lesson</p>
+        </div>
+
+        {/* SUBJECT SECTIONS */}
+        {Object.keys(subjects).map((key) => {
 
           const subject = subjects[key as keyof typeof subjects]
+          if (!subject) return null
 
-          if(!subject) return null
+          return (
 
-          return(
-
-            <div key={key} className="card">
+            <div key={key} className="subjectSection">
 
               <h2>{("name" in subject ? subject.name : key)}</h2>
 
-              {subject.units?.map((unit:any,i:number)=>{
+              {subject.units?.map((unit: any, i: number) => {
 
-                if(!unit) return null
+                if (!unit) return null
 
-                return(
+                return (
 
-                  <div key={i}>
+                  <div key={i} className="unitRow">
 
-                    <p className="unit">{unit.name}</p>
+                    <div className="unitTitle">
+                      {unit.name}
+                    </div>
 
-                    <ul>
+                    <div className="lessonRow">
 
-                      {unit.lessons?.map((lesson:string,j:number)=>(
+                      {unit.lessons?.map((lesson: string, j: number) => (
 
-                        <li
+                        <div
                           key={j}
-                          onClick={()=>openLesson(key, unit.name, lesson)}
+                          className="lessonCard"
+                          onClick={() => openLesson(key, unit.name, lesson)}
                         >
-                          {lesson}
-                        </li>
+                          <div className="lessonName">{lesson}</div>
+                        </div>
 
                       ))}
 
-                    </ul>
+                    </div>
 
                   </div>
 
@@ -99,73 +103,122 @@ export default function SubjectsPage(){
 
       </div>
 
+      {/* STYLES */}
       <style jsx>{`
 
         .page{
-          padding:40px;
+          min-height:100vh;
+          padding:60px 30px;
           background:#020617;
           color:white;
-          min-height:100vh;
+          position:relative;
+          overflow:hidden;
         }
 
-        h1{
-          font-size:32px;
-          margin-bottom:30px;
+        .content{
+          position:relative;
+          z-index:2;
+          max-width:1200px;
+          margin:auto;
+        }
+
+        .header{
           text-align:center;
+          margin-bottom:50px;
         }
 
-        .grid{
-          display:grid;
-          grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-          gap:25px;
+        .header h1{
+          font-size:42px;
         }
 
-        .card{
-          background:rgba(255,255,255,0.05);
-          border-radius:20px;
-          padding:20px;
-          border:1px solid rgba(255,255,255,0.1);
-          transition:.3s;
+        .header p{
+          margin-top:10px;
+          color:#94a3b8;
         }
 
-        .card:hover{
-          transform:translateY(-5px);
-          box-shadow:0 0 20px rgba(99,102,241,0.3);
+        /* SUBJECT */
+
+        .subjectSection{
+          margin-bottom:40px;
         }
 
-        h2{
+        .subjectSection h2{
+          font-size:24px;
           margin-bottom:15px;
-          font-size:20px;
           color:#a5b4fc;
         }
 
-        .unit{
-          margin-top:10px;
-          color:#94a3b8;
+        /* UNIT */
+
+        .unitRow{
+          margin-bottom:20px;
+        }
+
+        .unitTitle{
           font-size:14px;
+          color:#94a3b8;
+          margin-bottom:10px;
         }
 
-        ul{
-          list-style:none;
-          padding:0;
+        /* NETFLIX ROW */
+
+        .lessonRow{
+          display:flex;
+          gap:15px;
+          overflow-x:auto;
+          padding-bottom:10px;
         }
 
-        li{
-          padding:6px 0;
+        .lessonRow::-webkit-scrollbar{
+          height:6px;
+        }
+
+        .lessonRow::-webkit-scrollbar-thumb{
+          background:#6d28d9;
+          border-radius:10px;
+        }
+
+        /* CARD */
+
+        .lessonCard{
+          min-width:180px;
+          padding:20px;
+          border-radius:18px;
+          background:rgba(255,255,255,.06);
+          border:1px solid rgba(255,255,255,.18);
+          backdrop-filter:blur(25px);
           cursor:pointer;
-          color:#e2e8f0;
-          transition:.2s;
+          transition:.35s;
+          position:relative;
+          overflow:hidden;
         }
 
-        li:hover{
-          color:#60a5fa;
-          transform:translateX(5px);
+        .lessonCard::before{
+          content:"";
+          position:absolute;
+          inset:0;
+          background:radial-gradient(circle at top, rgba(147,51,234,.4), transparent 70%);
+          opacity:0;
+          transition:.4s;
+        }
+
+        .lessonCard:hover::before{
+          opacity:1;
+        }
+
+        .lessonCard:hover{
+          transform:scale(1.08);
+          box-shadow:0 0 40px rgba(147,51,234,.45);
+        }
+
+        .lessonName{
+          font-size:15px;
+          font-weight:500;
+          color:#e2e8f0;
         }
 
       `}</style>
 
     </div>
-
   )
-
 }

@@ -1,27 +1,22 @@
-"use client"
+import "./globals.css"
+import Providers from "./providers"
 
-import { SessionProvider } from "next-auth/react"
+export const metadata = {
+  title: "AI.SIRI",
+  description: "AI Learning Platform",
+}
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-
   return (
     <html lang="en">
-      <body
-        style={{
-          margin: 0,
-          background: "#000",
-          color: "#fff",
-          fontFamily: "Arial, sans-serif",
-          minHeight: "100vh"
-        }}
-      >
-        <SessionProvider>
+      <body>
+        <Providers>
           {children}
-        </SessionProvider>
+        </Providers>
       </body>
     </html>
   )

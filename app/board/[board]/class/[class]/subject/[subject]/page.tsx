@@ -2,105 +2,159 @@
 
 import { useParams, useRouter } from "next/navigation"
 import { syllabus } from "@/app/data/syllabus"
+import VantaBackground from "@/app/components/VantaBackground"
+import AuroraGlow from "@/app/components/AuroraGlow"
 
-export default function SubjectUnitsPage(){
+export default function SubjectUnitsPage() {
 
-const params = useParams()
-const router = useRouter()
+  const params = useParams()
+  const router = useRouter()
 
-const board = params.board as string
-const classId = params.class as string
-const subjectKey = params.subject as string
+  const board = params.board as string
+  const classId = params.class as string
+  const subjectKey = params.subject as string
 
-/* GET DATA */
+  /* GET DATA */
 
-const data = syllabus[classId as keyof typeof syllabus]
+  const data = syllabus[classId as keyof typeof syllabus]
 
-if(!data){
-return <p style={{color:"white",padding:40}}>No data</p>
-}
+  if (!data) {
+    return <p style={{ color: "white", padding: 40 }}>No data</p>
+  }
 
-const subject = data.subjects[subjectKey as keyof typeof data.subjects]
+  const subject = data.subjects[subjectKey as keyof typeof data.subjects]
 
-if(!subject){
-return <p style={{color:"white",padding:40}}>Subject not found</p>
-}
+  if (!subject) {
+    return <p style={{ color: "white", padding: 40 }}>Subject not found</p>
+  }
 
-/* UNITS */
+  const units = subject.units
 
-const units = subject.units
+  return (
+    <div className="page">
 
-return(
+      <VantaBackground />
+      <AuroraGlow />
 
-<div className="page">
+      <div className="content">
 
-<h1>{subject.name}</h1>
+        {/* HEADER */}
+        <div className="header">
+          <h1>{subject.name}</h1>
+          <p>Select a unit to start learning</p>
+        </div>
 
-<div className="grid">
+        {/* UNITS GRID */}
+        <div className="grid">
+          {units.map((unit: any, i: number) => {
 
-{units.map((unit:any,i:number)=>{
+            const slug = unit.name.toLowerCase().replace(/\s+/g, "-")
 
-const slug = unit.name.toLowerCase().replace(/\s+/g,"-")
+            return (
+              <div
+                key={i}
+                className="card"
+                onClick={() =>
+                  router.push(
+                    `/board/${board}/class/${classId}/${subjectKey}/${slug}`
+                  )
+                }
+              >
+                <div className="unitNumber">Unit {i + 1}</div>
+                <div className="unitName">{unit.name}</div>
+              </div>
+            )
+          })}
+        </div>
 
-return(
+      </div>
 
-<div
-key={i}
-className="card"
-onClick={()=>router.push(
-`/board/${board}/class/${classId}/${subjectKey}/${slug}`
-)}
->
+      {/* STYLES */}
+      <style jsx>{`
 
-{unit.name}
+        .page{
+          min-height:100vh;
+          padding:60px 30px;
+          background:#020617;
+          color:white;
+          position:relative;
+          overflow:hidden;
+        }
 
-</div>
+        .content{
+          position:relative;
+          z-index:2;
+          max-width:1100px;
+          margin:auto;
+        }
 
-)
+        .header{
+          text-align:center;
+          margin-bottom:50px;
+        }
 
-})}
+        .header h1{
+          font-size:40px;
+          font-weight:700;
+        }
 
-</div>
+        .header p{
+          margin-top:10px;
+          color:#94a3b8;
+        }
 
-<style jsx>{`
+        .grid{
+          display:grid;
+          grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+          gap:30px;
+        }
 
-.page{
-padding:40px;
-background:#020617;
-color:white;
-min-height:100vh;
-}
+        .card{
+          padding:28px;
+          border-radius:24px;
+          background:rgba(255,255,255,.06);
+          border:1px solid rgba(255,255,255,.18);
+          backdrop-filter:blur(30px);
+          cursor:pointer;
+          transition:.35s;
+          position:relative;
+          overflow:hidden;
+          text-align:center;
+        }
 
-h1{
-font-size:28px;
-margin-bottom:25px;
-}
+        /* Glow effect */
+        .card::before{
+          content:"";
+          position:absolute;
+          inset:0;
+          background:radial-gradient(circle at top, rgba(147,51,234,.4), transparent 70%);
+          opacity:0;
+          transition:.4s;
+        }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-gap:20px;
-}
+        .card:hover::before{
+          opacity:1;
+        }
 
-.card{
-padding:18px;
-border-radius:16px;
-background:rgba(255,255,255,0.05);
-border:1px solid rgba(255,255,255,0.1);
-cursor:pointer;
-transition:.3s;
-text-align:center;
-}
+        .card:hover{
+          transform:translateY(-10px) scale(1.05);
+          box-shadow:0 0 60px rgba(147,51,234,.45);
+        }
 
-.card:hover{
-transform:scale(1.05);
-background:rgba(255,255,255,0.08);
-}
+        .unitNumber{
+          font-size:13px;
+          color:#a78bfa;
+          margin-bottom:10px;
+        }
 
-`}</style>
+        .unitName{
+          font-size:18px;
+          font-weight:600;
+          color:#e2e8f0;
+        }
 
-</div>
+      `}</style>
 
-)
-
+    </div>
+  )
 }
