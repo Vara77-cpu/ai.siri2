@@ -434,7 +434,7 @@ export default function WelcomePage() {
           </div>
 
           {speechFinished && (
-            <button className="enterBtn" onClick={() => router.push("/dashboard")}>
+            <button className="enterBtn" onClick={() => router.push("/greeting")}>
               <span className="btnText">Enter Dashboard</span>
               <span className="btnArrow">→</span>
               <div className="btnGlow" />

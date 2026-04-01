@@ -448,7 +448,21 @@ export default function Dashboard() {
               <div className="icon">🎓</div>
               <div className="featureLabel">Explore</div>
             </div>
+            <div className="featureCard" onClick={() => router.push("/results")}>
+              <div className="icon">🗺️</div>
+              <div className="featureLabel">Live results</div>
+            </div>
+            <div className="featureCard" onClick={() => router.push("/roadmap")}>
+              <div className="icon">🗺️</div>
+              <div className="featureLabel">RoadMap</div>
+            </div>
+            <div className="featureCard" onClick={() => router.push("/quiz")}>
+              <div className="icon">🧩</div>
+              <div className="featureLabel">Quiz</div>
+            </div>
           </div>
+          
+          
 
           <div className="userFooter">
             <div className="userInfo">

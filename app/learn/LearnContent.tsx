@@ -372,8 +372,8 @@ export default function LearnContent() {
         * { box-sizing:border-box; }
 
         .page {
-          font-family: 'Rajdhani', sans-serif;
-          background: radial-gradient(ellipse at 20% 0%, #0f0428 0%, #03000f 45%, #000813 100%);
+          font-family: sans-serif;
+          background: radial-gradient(ellipse at 20% 0%, #0f0428 0%, #03000f 20%, #000813 100%);
           color: white;
           min-height: 100vh;
           position: relative;
